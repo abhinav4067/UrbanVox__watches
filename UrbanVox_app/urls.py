@@ -24,7 +24,7 @@ urlpatterns = [
     path('authentication-reset-password/',views.reset_password,name='authentication-reset-password'),
     
     path('billing-details/',views.billing_details,name='billing-details'),
-    path('blog-post/',views.blog_post,name='blog-post'),
+    
    
     path('cart/',views.cart1,name='cart'),  
     path('addToWishlistFromCart/<id>',views.addToWishlistFromCart,name='addToWishlistFromCart'),
@@ -40,6 +40,8 @@ urlpatterns = [
     path('footer/',views.footer,name='footer'),
     path('SignOut/',views.SignOut,name='SignOut'),
     path('search/',views.search,name='search'),
+    path('addToCartFromSearch/<id>',views.addToCartFromSearch,name='addToCartFromSearch'),
+    path('addToWishlistFromSearch/<id>',views.addToWishlistFromSearch,name='addToWishlistFromSearch'),
     
     
     

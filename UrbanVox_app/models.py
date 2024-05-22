@@ -75,7 +75,7 @@ class cart(models.Model):
 
     user_id=models.ForeignKey(user_reg,on_delete=models.CASCADE)
     product_id=models.ForeignKey(product,on_delete=models.CASCADE)
-    cart_amount=models.IntegerField() 
+    cart_amount=models.IntegerField(null=True) 
     qty=models.IntegerField(null=True,default=1)
 
 
@@ -94,15 +94,15 @@ class orders(models.Model):
     order_status=models.TextField(choices=STATUS_CHOICE,default=CART_STAGE )               
     user_id=models.ForeignKey(user_reg,on_delete=models.CASCADE)
     product_id=models.ForeignKey(product,on_delete=models.CASCADE,null=True)
-    order_amount=models.IntegerField()
-    ordered_date=models.DateField()
+    order_amount=models.IntegerField(null=True)
+    ordered_date=models.DateField(null=True)
     ordered_qty=models.IntegerField(null=True)
     first_name=models.CharField(max_length=100,null=True)
     last_name=models.CharField(max_length=50,null=True)
     email=models.EmailField(null=True)
-    mobile_num=models.IntegerField(null=True)
+    mobile_num=models.CharField(max_length=12,null=True)
     street_address=models.CharField(max_length=300,null=True)
-    pincode=models.IntegerField(null=True)
+    pincode=models.CharField(max_length=10,null=True)
     city=models.CharField(max_length=50,null=True)
     country=models.CharField(max_length=50,null=True)
     
@@ -113,8 +113,8 @@ class orders(models.Model):
 
 class payment(models.Model):
     user_id=models.ForeignKey(user_reg,on_delete=models.CASCADE)
-    amount=models.IntegerField()
-    payment_date=models.DateField()
+    amount=models.IntegerField(null=True)
+    payment_date=models.DateField(null=True)
 
 
 # models of supplier.
@@ -124,7 +124,7 @@ class payment(models.Model):
 class supplier_reg(models.Model):
     supplier_full_name=models.CharField(max_length=100)
     supplier_email=models.EmailField()
-    supplier_mob_number=models.PositiveIntegerField()
+    supplier_mob_number=models.PositiveIntegerField(null=True)
     supplier_password=models.TextField()
     supplier_cpassword=models.TextField()
 

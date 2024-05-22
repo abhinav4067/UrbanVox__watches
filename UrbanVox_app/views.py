@@ -9,7 +9,6 @@ from django.shortcuts import render
 from . models import *
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-
 from django.contrib.auth.decorators import login_required
 
 
@@ -78,7 +77,7 @@ def add_product(request):
 
 
 
-
+@login_required(login_url='authentication-login')
 def account_orders(request):
     user_id = request.session.get("user_ID")
     reg_id = user_reg.objects.get(user__id=user_id)
@@ -97,7 +96,7 @@ def about_us(request):
 
 
 
-
+@login_required(login_url='authentication-login')
 def account_profile(request):
     user_id = request.session.get("user_ID")
     
@@ -106,7 +105,7 @@ def account_profile(request):
 
     return render(request,'account-profile.html',{"data":data})
 
-
+@login_required(login_url='authentication-login')
 def update_profile(request):
    
         user_id = request.session.get("user_ID")
@@ -242,6 +241,7 @@ def payment_method(request):
 def index(request):
     featured_product=product.objects.order_by('priority')[:4]
     latest_product=product.objects.order_by('-id')[:8]
+    
     context={
         'featured_product':featured_product,
         'latest_product':latest_product,
@@ -305,7 +305,7 @@ def addToCartFromWish(request,id):
        
     return redirect('wishlist')
 
-
+@login_required(login_url='authentication-login')
 def removeCart(request,id):
     cart_remove=cart.objects.get(id=id)
     cart_remove.delete()
@@ -367,7 +367,7 @@ def RemoveWishlist(request,id):
 
 
 
-
+@login_required(login_url='authentication-login')
 def product_details(request, id1):
     u_id = request.session['user_ID']
     user = user_reg.objects.get(user__id=u_id)
@@ -382,7 +382,9 @@ def product_details(request, id1):
         obj.save()
 
     reviews = review.objects.filter(product_id=data)
+ 
     count = reviews.count()
+   
 
     
     
@@ -396,9 +398,9 @@ def product_details(request, id1):
     for s in sum_of_rating:
         sum+=s.user_rating
         
-     
-    
-    average_rating=round(int (sum) / int(count))
+    average_rating=None
+    if count>0:
+     average_rating=round(int (sum) / int(count))
     price = data.product_price
     off = data.product_offer
     offer_price = 0
@@ -417,7 +419,8 @@ def product_details(request, id1):
         'count_4star':count_4star,
         'count_3star':count_3star,
         'count_2star':count_2star,
-        'count_1star':count_1star
+        'count_1star':count_1star,
+        
     }
 
     if 'addToCart' in request.POST:
@@ -494,15 +497,55 @@ def all_products(request):
 def footer(request):
     return render(request,'footer.html')
 def search(request):
-     """ search function  """
-     if 'searchbtn' in request.POST:
-        query_name = request.POST['search']
-        if query_name:
-            results = product.objects.filter(product_name__contains=query_name)
+    watches_name = None
+    watches_brand = None
+    combined_results = None
+    
+    if 'search' in request.POST:
+        searchtxt = request.POST.get('tosearch', '').strip()
         
-        return render(request,'all-products.html',{'results':results})
+        if searchtxt:
+            watches_name = product.objects.filter(product_name__icontains=searchtxt).order_by('-id')
+            watches_brand = product.objects.filter(product_brand__icontains=searchtxt).order_by('-id')
+            combined_results = (watches_name | watches_brand).distinct()
+    
+    context = {
+        "watches_name": watches_name,
+        "watches_brand": watches_brand,
+        "combined_results": combined_results,
+    }
+    
+    return render(request, 'search.html', context)
 
-     return render(request,'search.html')
+
+@login_required(login_url='authentication-login')
+def addToWishlistFromSearch(request,id):
+
+    data=product.objects.get(id=id)
+    
+   
+    u_id=request.session['user_ID']
+    user=user_reg.objects.get(user__id=u_id)
+    obj=wishlist.objects.create(user_id=user,product_id=data)
+    obj.save()
+    
+       
+    return redirect('search')
+
+@login_required(login_url='authentication-login')
+def addToCartFromSearch(request,id):
+
+    data=product.objects.get(id=id)
+    
+   
+    u_id=request.session['user_ID']
+    user=user_reg.objects.get(user__id=u_id)
+    obj=cart.objects.create(user_id=user,product_id=data)
+    obj.save()
+    
+       
+    return redirect('search')
+
 
 
 
