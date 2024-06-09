@@ -624,35 +624,37 @@ def billing_details(request):
 
     k=cart.qty
     print(k)
-    if request.POST:      
-              
-       qty=i.qty
-       f_name=request.POST["fname"]
-       l_name=request.POST["lname"]
-       email=request.POST["email"]
-       mobile_number=request.POST["mobile_num"]
-       street_address=request.POST["street_address"]
-       pincode=request.POST["pincode"]
-       city=request.POST["city"]
-       country=request.POST["country"]
-       current_date=date.today()
-      
-       productID=i.product_id
+    if request.POST:  
+     for item in data:  
+        qty = item.qty  
 
+        f_name = request.POST["fname"]
+        l_name = request.POST["lname"]
+        email = request.POST["email"]
+        mobile_number = request.POST["mobile_num"]
+        street_address = request.POST["street_address"]
+        pincode = request.POST["pincode"]
+        city = request.POST["city"]
+        country = request.POST["country"]
+        current_date = date.today()
 
-            
-       obj=orders.objects.create(user_id=reg_id,product_id=productID,order_amount=last_total,ordered_qty=qty,ordered_date=current_date,first_name=f_name,last_name=l_name,email=email,mobile_num=mobile_number,street_address=street_address,pincode=pincode,city=city,country=country)
-       
-       
+        productID = item.product_id
+
+        obj = orders.objects.create(user_id=reg_id, product_id=productID, order_amount=last_total,
+                                    ordered_qty=qty, ordered_date=current_date, first_name=f_name, last_name=l_name,
+                                    email=email, mobile_num=mobile_number, street_address=street_address,
+                                    pincode=pincode, city=city, country=country)
+
+        obj.save()
+        product_id = item.product_id.id
+        pro = product.objects.get(id=product_id)
+        pro.product_qty -= int(qty)
+        pro.save()
+
+        data.delete()
+        return redirect("cart")
+
         
-       obj.save()
-       product_id=i.product_id.id
-       pro=product.objects.get(id=product_id)
-       pro.product_qty -= int(qty)
-       pro.save()
-
-       data.delete()
-       return redirect("cart")
     return render(request,'billing-details.html',context)
 
 
